@@ -1,0 +1,36 @@
+.fibonacci__layout {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 48px;
+  gap: 12px;
+}
+
+.fibonacci__input {
+  max-width: 378px;
+}
+
+.fibonacci__button {
+  max-width: 178px;
+  height: 60px;
+  width: 100%;
+}
+
+.fibonacci__circles {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 48px;
+  flex-wrap: wrap;
+}
+
+.fibonacci__visible {
+  visibility: visible;
+  margin-bottom: 48px;
+}
+
+.fibonacci__invisible {
+  visibility: hidden;
+}
