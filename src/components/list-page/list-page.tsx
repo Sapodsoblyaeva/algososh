@@ -411,7 +411,7 @@ export const ListPage: React.FC = () => {
                 tail={status.tail}
                 state={state}
               />
-              {status.tail !== "tail" && <ArrowIcon />}
+              {index !== listForRendering.length - 1 && <ArrowIcon />}
             </div>
           );
         })}

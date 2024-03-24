@@ -44,6 +44,7 @@ export const StringComponent: React.FC = () => {
   };
 
   const onClick = () => {
+    setIsLoading(true);
     const steps = reverseString(inputValue);
 
     setWord(steps);
@@ -54,7 +55,6 @@ export const StringComponent: React.FC = () => {
     let index = 0;
 
     const intervalId = setInterval(() => {
-      setIsLoading(true);
       if (index >= steps.length - 1) {
         clearInterval(intervalId);
         setIsLoading(false);
@@ -64,6 +64,7 @@ export const StringComponent: React.FC = () => {
     }, 1000);
 
     setCircle(true);
+    setInputValue("");
   };
 
   return (
