@@ -1,4 +1,4 @@
-import React, { MouseEvent, useState } from "react";
+import React, { MouseEvent, useEffect, useState } from "react";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { RadioInput } from "../ui/radio-input/radio-input";
 import { Button } from "../ui/button/button";
@@ -48,6 +48,12 @@ export const SortingPage: React.FC = () => {
   const [buttonDescendingDisabled, setDescendingButtonDisabled] =
     useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isChecked, setIsChecked] = useState<boolean>(false);
+
+  useEffect(() => {
+    const randomArray = createRandomArr();
+    setRandomArray(randomArray);
+  }, []);
 
   const onRandomClick = async () => {
     const randomArray = createRandomArr();
@@ -124,6 +130,8 @@ export const SortingPage: React.FC = () => {
 
   const checkRadioInput = (e: MouseEvent<HTMLInputElement>) => {
     const { name } = e.target as HTMLInputElement;
+    setIsChecked(true);
+
     if (name === "bubble") {
       setBubbleInput(true);
       setSelectionInput(false);
@@ -161,8 +169,7 @@ export const SortingPage: React.FC = () => {
             text="По убыванию"
             onClick={onDescendingClick}
             sorting={Direction.Ascending}
-            disabled={
-              buttonDescendingDisabled
+            disabled={!isChecked ? true : buttonDescendingDisabled
                 ? buttonDescendingDisabled
                 : buttonAscendingDisabled
                 ? true
@@ -177,8 +184,7 @@ export const SortingPage: React.FC = () => {
             text="По возрастанию"
             onClick={onAscendingClick}
             sorting={Direction.Descending}
-            disabled={
-              buttonAscendingDisabled
+            disabled={!isChecked ? true : buttonAscendingDisabled
                 ? buttonAscendingDisabled
                 : buttonDescendingDisabled
                 ? true

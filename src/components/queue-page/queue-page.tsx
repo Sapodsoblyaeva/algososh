@@ -7,6 +7,8 @@ import { Circle } from "../ui/circle/circle";
 import { Queue } from "./algorithms";
 import { sleep } from "../../utils/utils";
 import { ElementStates } from "../../types/element-states";
+import { useForm } from "../../hooks/useForm";
+import { DELAY_IN_MS, SHORT_DELAY_IN_MS } from "../../constants/delays";
 
 const getQueueStatus = (index: number, arr: (string | null)[]) => {
   let firstFilledIndex = null;
@@ -41,7 +43,6 @@ const getQueueItemStatus = (i: number, addingElementIndex: number | null) => {
 };
 
 export const QueuePage: React.FC = () => {
-  const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [addingElementIndex, setAddingElementIndex] = useState<number | null>(
     null
@@ -55,11 +56,13 @@ export const QueuePage: React.FC = () => {
   const [buttonAddDisabled, setButtonAddDisabled] = useState<boolean>(false);
   const [buttonDeleteDisabled, setButtonDeleteDisabled] =
     useState<boolean>(false);
+  const [buttonClearDisabled, setButtonClearDeleteDisabled] =
+    useState<boolean>(false);
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target as HTMLButtonElement;
-    setInputValue(value);
-  };
+  const { values, handleChange } = useForm({
+    inputValueStr: "",
+    inputValueNum: "",
+  });
 
   const renderInitialCircles = () => {
     const queueItems = initialQueue.getElements();
@@ -87,23 +90,34 @@ export const QueuePage: React.FC = () => {
   };
 
   useEffect(() => {
+    if (values.inputValueStr === "") {
+      setButtonAddDisabled(true);
+      setButtonDeleteDisabled(true);
+      setButtonClearDeleteDisabled(true);
+    } else {
+      setButtonAddDisabled(false);
+    }
+    if (initialQueue.getSize() >= 0) {
+      setButtonDeleteDisabled(false);
+      setButtonClearDeleteDisabled(false);
+    }
     if (initialQueue.length === size) {
       setButtonAddDisabled(true);
     }
-  }, [addingElementIndex]);
+  }, [addingElementIndex, values.inputValueStr]);
 
   const onAddClick = async () => {
     setIsLoading(true);
     setButtonDeleteDisabled(true);
-    await sleep(500);
-    initialQueue.enqueue(inputValue);
+    await sleep(SHORT_DELAY_IN_MS);
+    initialQueue.enqueue(values.inputValueStr);
     setInitialQueue(initialQueue);
     setAddingElementIndex(initialQueue.getSize());
     setTimeout(() => {
       setAddingElementIndex(null);
-    }, 1000);
+    }, DELAY_IN_MS);
 
-    setInputValue("");
+    values.inputValueStr = "";
     setButtonDeleteDisabled(false);
     setIsLoading(false);
   };
@@ -116,9 +130,9 @@ export const QueuePage: React.FC = () => {
     setAddingElementIndex(0);
     setTimeout(() => {
       setAddingElementIndex(null);
-    }, 1000);
+    }, DELAY_IN_MS);
 
-    await sleep(1000);
+    await sleep(DELAY_IN_MS);
     initialQueue.dequeue();
 
     const newQueue = initialQueue.getElements();
@@ -148,8 +162,9 @@ export const QueuePage: React.FC = () => {
             isLimitText={true}
             maxLength={4}
             onChange={handleChange}
-            value={inputValue}
+            value={values.inputValueStr}
             type="text"
+            name="inputValueStr"
           />
           <Button
             extraClass={styles.queue__button}
@@ -176,12 +191,7 @@ export const QueuePage: React.FC = () => {
           isLoader={
             buttonAddDisabled || buttonDeleteDisabled ? false : isLoading
           }
-          disabled={
-            (buttonAddDisabled && isLoading) ||
-            (buttonDeleteDisabled && isLoading)
-              ? true
-              : isLoading
-          }
+          disabled={buttonClearDisabled}
         />
       </div>
       <div className={styles.queue__circles}>{renderInitialCircles()}</div>

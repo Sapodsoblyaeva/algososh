@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";
@@ -7,6 +7,8 @@ import { Circle } from "../ui/circle/circle";
 import { sleep } from "../../utils/utils";
 import { Stack } from "./algorithm";
 import { ElementStates } from "../../types/element-states";
+import { useForm } from "../../hooks/useForm";
+import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 
 type Props = {
   index: number;
@@ -30,7 +32,6 @@ const getStackItemPosition = ({ index, top }: Props) => {
 };
 
 export const StackPage: React.FC = () => {
-  const [inputValue, setInputValue] = useState("");
   const [open, setOpen] = useState<boolean>(false);
   const [addingElementIndex, setAddingElementIndex] = useState<number | null>(
     null
@@ -40,29 +41,42 @@ export const StackPage: React.FC = () => {
   const [buttonDeleteDisabled, setButtonDeleteDisabled] =
     useState<boolean>(false);
   const [top, setTop] = useState<number>(0);
-
   const [stackNew, setStackNew] = useState(new Stack<string>());
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target as HTMLInputElement;
-    setInputValue(value);
-  };
+  const { values, handleChange } = useForm({
+    inputValueStr: "",
+    inputValueNum: "",
+  });
+
+  useEffect(() => {
+    if (values.inputValueStr === "") {
+      setButtonAddDisabled(true);
+      setButtonDeleteDisabled(true);
+    } else {
+      setButtonAddDisabled(false);
+    }
+
+    if (stackNew.getSize() !== 0) {
+      setButtonDeleteDisabled(false);
+      setButtonAddDisabled(false);
+    }
+  }, [values.inputValueStr, stackNew]);
 
   const onAddClick = async () => {
     setButtonDeleteDisabled(true);
     setIsLoading(true);
 
-    await sleep(500);
-    stackNew.push(inputValue);
+    await sleep(SHORT_DELAY_IN_MS);
+    stackNew.push(values.inputValueStr);
     setStackNew(stackNew);
 
-    setInputValue("");
+    values.inputValueStr = "";
     setOpen(true);
 
     setAddingElementIndex(stackNew.getSize() - 1);
     setTimeout(() => {
       setAddingElementIndex(null);
-    }, 500);
+    }, SHORT_DELAY_IN_MS);
 
     setTop(stackNew.getSize() - 1);
     setIsLoading(false);
@@ -76,9 +90,9 @@ export const StackPage: React.FC = () => {
     setAddingElementIndex(stackNew.getSize() - 1);
     setTimeout(() => {
       setAddingElementIndex(null);
-    }, 500);
+    }, SHORT_DELAY_IN_MS);
 
-    await sleep(500);
+    await sleep(SHORT_DELAY_IN_MS);
     stackNew.pop();
     setStackNew(stackNew);
     setTop(stackNew.getSize() - 1);
@@ -101,9 +115,10 @@ export const StackPage: React.FC = () => {
             isLimitText={true}
             maxLength={4}
             onChange={handleChange}
-            value={inputValue}
+            value={values.inputValueStr}
             type="text"
             max={4}
+            name="inputValueStr"
           />
           <Button
             extraClass={styles.stack__button}

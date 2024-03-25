@@ -1,8 +1,8 @@
 import { ChangeEvent, useState } from "react";
 
 export type inputValues = {
-  headTail: string;
-  index: string;
+  inputValueStr: string;
+  inputValueNum: string;
 };
 
 export function useForm(inputValues: inputValues) {

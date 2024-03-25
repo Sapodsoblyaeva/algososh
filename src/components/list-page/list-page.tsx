@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import styles from "./list-page.module.css";
 import { Input } from "../ui/input/input";
@@ -9,6 +9,8 @@ import { LinkedList } from "./algorithm";
 import { useForm } from "../../hooks/useForm";
 import { ElementStates } from "../../types/element-states";
 import { addingTimer, sleep } from "../../utils/utils";
+import { DELAY_IN_MS, LONG_DELAY_IN_MS } from "../../constants/delays";
+import { HEAD, TAIL } from "../../constants/element-captions";
 
 const getListStatus = (
   index: number,
@@ -55,7 +57,7 @@ const getListStatus = (
       deletingElementIndex
     );
     return {
-      head: index === 0 ? "head" : null,
+      head: index === 0 ? HEAD : null,
       tail: (
         <Circle
           letter={letter === null ? undefined : letter}
@@ -67,15 +69,15 @@ const getListStatus = (
   }
 
   if (arr.length >= 2 && index === arr.length - 1) {
-    return { head: null, tail: "tail" };
+    return { head: null, tail: TAIL };
   }
 
   if (index === arr.length - 1 && arr.length < 2) {
-    return { head: "head", tail: "tail" };
+    return { head: HEAD, tail: TAIL };
   }
 
   if (index === firstFilledIndex) {
-    return { head: "head", tail: null };
+    return { head: HEAD, tail: null };
   }
 
   return { head: null, tail: null };
@@ -130,8 +132,8 @@ export const ListPage: React.FC = () => {
   const [list, setList] = useState(new LinkedList<string>());
   const [listForRendering, setListForRendering] = useState<string[]>([]);
   const { values, handleChange } = useForm({
-    headTail: "",
-    index: "",
+    inputValueStr: "",
+    inputValueNum: "",
   });
   const [addingElementIndex, setAddingElementIndex] = useState<number | null>(
     null
@@ -156,6 +158,13 @@ export const ListPage: React.FC = () => {
   const [isIndexDeletedLoading, setIsIndexDeletedLoading] =
     useState<boolean>(false);
   const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
+  const [addButtonDisabled, setAddButtonDisabled] = useState<boolean>(false);
+  const [buttonAddIndexDisabled, setButtonAddIndexDisabled] =
+    useState<boolean>(false);
+  const [deleteButtonDisabled, setDeleteButtonDisabled] =
+    useState<boolean>(false);
+  const [buttonDeleteIndexDisabled, setButtonDeleteIndexDisabled] =
+    useState<boolean>(false);
 
   useEffect(() => {
     list.prepend("0");
@@ -167,34 +176,64 @@ export const ListPage: React.FC = () => {
     setListForRendering(result);
   }, []);
 
+  useEffect(() => {
+    if (values.inputValueStr === "") {
+      setAddButtonDisabled(true);
+    } else {
+      setAddButtonDisabled(false);
+    }
+
+    if (values.inputValueNum === "" || values.inputValueStr === "") {
+      setButtonAddIndexDisabled(true);
+    } else {
+      setButtonAddIndexDisabled(false);
+    }
+  }, [values.inputValueStr, values.inputValueNum]);
+
+  useEffect(() => {
+    if (
+      parseInt(values.inputValueNum) < 0 ||
+      parseInt(values.inputValueNum) > listForRendering.length - 1 ||
+      listForRendering.length === 0 ||
+      buttonDisabled
+    ) {
+      setDeleteButtonDisabled(true);
+      setButtonDeleteIndexDisabled(true);
+    } else {
+      setDeleteButtonDisabled(false);
+      setButtonDeleteIndexDisabled(false);
+    }
+  }, [listForRendering, values.inputValueNum, buttonDisabled]);
+
   const onAddToHeadClick = () => {
     setIsNewHeadLoading(true);
-    setButtonDisabled(true);
-
-    list.prepend(values.headTail);
+    setDeleteButtonDisabled(true);
+    setButtonDeleteIndexDisabled(true);
+    list.prepend(values.inputValueStr);
     const result = list.print();
     addingTimer(0, setAddingElementIndex);
 
     setAddedElementIndex(0);
     setTimeout(() => {
       setAddedElementIndex(null);
-    }, 1500);
+    }, LONG_DELAY_IN_MS);
 
-    setNewValue(values.headTail);
+    setNewValue(values.inputValueStr);
     setTimeout(() => {
       setListForRendering(result);
       setIsNewHeadLoading(false);
-      setButtonDisabled(false);
-    }, 1000);
+      setDeleteButtonDisabled(false);
+      setButtonDeleteIndexDisabled(false);
+    }, DELAY_IN_MS);
 
-    values.headTail = "";
+    values.inputValueStr = "";
   };
 
   const onAddToTailClick = () => {
     setIsNewTailLoading(true);
-    setButtonDisabled(true);
-
-    list.append(values.headTail);
+    setDeleteButtonDisabled(true);
+    setButtonDeleteIndexDisabled(true);
+    list.append(values.inputValueStr);
     const result = list.print();
 
     addingTimer(list.getSize() - 2, setAddingElementIndex);
@@ -202,51 +241,58 @@ export const ListPage: React.FC = () => {
     setAddedElementIndex(list.getSize() - 1);
     setTimeout(() => {
       setAddedElementIndex(null);
-    }, 1500);
-    setNewValue(values.headTail);
+    }, LONG_DELAY_IN_MS);
+    setNewValue(values.inputValueStr);
 
     setTimeout(() => {
       setListForRendering(result);
       setIsNewTailLoading(false);
-      setButtonDisabled(false);
-    }, 1000);
+      setDeleteButtonDisabled(false);
+      setButtonDeleteIndexDisabled(false);
+    }, DELAY_IN_MS);
 
-    values.headTail = "";
+    values.inputValueStr = "";
   };
 
   const onAddIndexClick = async () => {
     setIsNewIndexLoading(true);
-    setButtonDisabled(true);
-    list.insertAt(values.headTail, parseInt(values.index));
+    setAddButtonDisabled(true);
+    setDeleteButtonDisabled(true);
+    setButtonDeleteIndexDisabled(true);
+
+    list.insertAt(values.inputValueStr, parseInt(values.inputValueNum));
 
     const result = list.print();
 
-    setNewValue(values.headTail);
-    for (let i = 0; i <= parseInt(values.index); i++) {
-      await sleep(1000);
+    setNewValue(values.inputValueStr);
+    for (let i = 0; i <= parseInt(values.inputValueNum); i++) {
+      await sleep(DELAY_IN_MS);
       setAddingElementIndex(i);
       setTimeout(() => {
         setAddingElementIndex(null);
-      }, 1000);
+      }, DELAY_IN_MS);
     }
 
-    setAddedElementIndex(parseInt(values.index));
+    setAddedElementIndex(parseInt(values.inputValueNum));
     setTimeout(() => {
       setAddedElementIndex(null);
-    }, 1500);
+    }, LONG_DELAY_IN_MS);
 
     setTimeout(() => {
       setListForRendering(result);
       setIsNewIndexLoading(false);
-      setButtonDisabled(false);
-    }, 1000);
+      setDeleteButtonDisabled(false);
+      setButtonDeleteIndexDisabled(false);
+      setAddButtonDisabled(false);
+    }, DELAY_IN_MS);
 
-    values.index = "";
-    values.headTail = "";
+    values.inputValueNum = "";
+    values.inputValueStr = "";
   };
 
   const onDeleteHeadClick = () => {
     setIsHeadDeletedLoading(true);
+
     setButtonDisabled(true);
 
     setNewValue(list.head!.value);
@@ -261,12 +307,13 @@ export const ListPage: React.FC = () => {
       setListForRendering(result);
       setIsHeadDeletedLoading(false);
       setButtonDisabled(false);
-    }, 1000);
+    }, DELAY_IN_MS);
   };
 
-  const onDeleteTailClick = () => {
+  const onDeleteTailClick = async () => {
     setIsTailDeletedLoading(true);
     setButtonDisabled(true);
+
     setNewValue(list.tail!.value);
     list.makeElementNull(list.tail, "");
     setListForRendering(list.print());
@@ -279,38 +326,41 @@ export const ListPage: React.FC = () => {
       setListForRendering(result);
       setIsTailDeletedLoading(false);
       setButtonDisabled(false);
-    }, 1000);
+      setButtonDeleteIndexDisabled(false);
+    }, DELAY_IN_MS);
   };
 
   const onDeleteIndexClick = async () => {
     setIsIndexDeletedLoading(true);
-    setButtonDisabled(true);
-    const node = list.find(parseInt(values.index));
+
+    setDeleteButtonDisabled(true);
+
+    const node = list.find(parseInt(values.inputValueNum));
 
     setNewValue(node!.value);
 
-    for (let i = 0; i <= parseInt(values.index); i++) {
-      await sleep(1000);
+    for (let i = 0; i <= parseInt(values.inputValueNum); i++) {
+      await sleep(DELAY_IN_MS);
       setDeletingElementIndex(i);
       setTimeout(() => {
         setDeletingElementIndex(null);
-      }, 1000);
+      }, DELAY_IN_MS);
     }
 
     list.makeElementNull(node, "");
     setListForRendering(list.print());
 
-    list.deleteAtIndex(parseInt(values.index));
+    list.deleteAtIndex(parseInt(values.inputValueNum));
     const result = list.print();
 
     setTimeout(() => {
       setListForRendering(result);
       setIsIndexDeletedLoading(false);
-      setButtonDisabled(false);
-    }, 1000);
+      setDeleteButtonDisabled(false);
+    }, DELAY_IN_MS);
 
-    values.index = "";
-    values.headTail = "";
+    values.inputValueNum = "";
+    values.inputValueStr = "";
   };
 
   return (
@@ -322,9 +372,9 @@ export const ListPage: React.FC = () => {
             isLimitText={true}
             maxLength={4}
             onChange={handleChange}
-            value={values.headTail}
+            value={values.inputValueStr}
             type="text"
-            name={"headTail"}
+            name={"inputValueStr"}
           />
           <Button
             extraClass={styles.list__button}
@@ -332,7 +382,7 @@ export const ListPage: React.FC = () => {
             text="Добавить в head"
             onClick={onAddToHeadClick}
             isLoader={isNewHeadLoading}
-            disabled={buttonDisabled}
+            disabled={addButtonDisabled}
           />
           <Button
             extraClass={styles.list__button}
@@ -340,7 +390,7 @@ export const ListPage: React.FC = () => {
             text="Добавить в tail"
             onClick={onAddToTailClick}
             isLoader={isNewTailLoading}
-            disabled={buttonDisabled}
+            disabled={addButtonDisabled}
           />
           <Button
             extraClass={styles.list__button}
@@ -348,7 +398,7 @@ export const ListPage: React.FC = () => {
             text="Удалить из head"
             onClick={onDeleteHeadClick}
             isLoader={isHeadDeletedLoading}
-            disabled={buttonDisabled}
+            disabled={deleteButtonDisabled}
           />
           <Button
             extraClass={styles.list__button}
@@ -356,16 +406,16 @@ export const ListPage: React.FC = () => {
             text="Удалить из tail"
             onClick={onDeleteTailClick}
             isLoader={isTailDeletedLoading}
-            disabled={buttonDisabled}
+            disabled={deleteButtonDisabled}
           />
         </div>
         <div className={styles.list__buttons}>
           <Input
             extraClass={styles.list__input}
             onChange={handleChange}
-            value={values.index}
-            type="text"
-            name="index"
+            value={values.inputValueNum}
+            type="number"
+            name="inputValueNum"
           />
           <Button
             extraClass={styles.list__bigButton}
@@ -373,7 +423,7 @@ export const ListPage: React.FC = () => {
             text="Добавить по индексу"
             onClick={onAddIndexClick}
             isLoader={isNewIndexLoading}
-            disabled={buttonDisabled}
+            disabled={buttonAddIndexDisabled}
           />
           <Button
             extraClass={styles.list__bigButton}
@@ -381,7 +431,7 @@ export const ListPage: React.FC = () => {
             text="Удалить по индексу"
             onClick={onDeleteIndexClick}
             isLoader={isIndexDeletedLoading}
-            disabled={buttonDisabled}
+            disabled={buttonDeleteIndexDisabled}
           />
         </div>
       </div>

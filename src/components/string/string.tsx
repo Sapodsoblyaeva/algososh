@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";
@@ -6,6 +6,8 @@ import styles from "./string.module.css";
 import { Circle } from "../ui/circle/circle";
 import { ElementStates } from "../../types/element-states";
 import { reverseString } from "./algorithm";
+import { useForm } from "../../hooks/useForm";
+import { DELAY_IN_MS } from "../../constants/delays";
 
 type Props = {
   index: number;
@@ -32,20 +34,26 @@ const getLetterStatus = ({ index, word, currentIndex }: Props) => {
 };
 
 export const StringComponent: React.FC = () => {
-  const [inputValue, setInputValue] = useState("");
   const [circle, setCircle] = useState<boolean>(false);
   const [word, setWord] = useState<string[][]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target as HTMLButtonElement;
-    setInputValue(value);
-  };
+  const { values, handleChange } = useForm({
+    inputValueStr: "",
+    inputValueNum: "",
+  });
+
+  useEffect(() => {
+    values.inputValueStr === ""
+      ? setIsButtonDisabled(true)
+      : setIsButtonDisabled(false);
+  }, [values.inputValueStr]);
 
   const onClick = () => {
     setIsLoading(true);
-    const steps = reverseString(inputValue);
+    const steps = reverseString(values.inputValueStr);
 
     setWord(steps);
     setCurrentIndex(0);
@@ -61,10 +69,10 @@ export const StringComponent: React.FC = () => {
         return;
       }
       setCurrentIndex(++index);
-    }, 1000);
+    }, DELAY_IN_MS);
 
     setCircle(true);
-    setInputValue("");
+    values.inputValueStr = "";
   };
 
   return (
@@ -75,8 +83,9 @@ export const StringComponent: React.FC = () => {
           isLimitText={true}
           maxLength={11}
           onChange={handleChange}
-          value={inputValue}
+          value={values.inputValueStr}
           type="text"
+          name="inputValueStr"
         />
         <Button
           extraClass={styles.string__button}
@@ -84,6 +93,7 @@ export const StringComponent: React.FC = () => {
           text="Развернуть"
           onClick={onClick}
           isLoader={isLoading}
+          disabled={isButtonDisabled}
         />
       </div>
       <div className={styles.string__circles}>

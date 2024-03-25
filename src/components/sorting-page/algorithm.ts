@@ -1,3 +1,4 @@
+import { DELAY_IN_MS } from "../../constants/delays";
 import { sleep, swap } from "../../utils/utils";
 
 export const selectionSort = async (
@@ -18,7 +19,7 @@ export const selectionSort = async (
 
     for (let j = i + 1; j < initialArray.length; j++) {
       setChangingElements([i, j]);
-      await sleep(1000);
+      await sleep(DELAY_IN_MS);
 
       if (order === "ascending") {
         if (initialArray[indexMin] > initialArray[j]) {
@@ -31,7 +32,7 @@ export const selectionSort = async (
       }
     }
     if (indexMin !== i) {
-      await sleep(1000);
+      await sleep(DELAY_IN_MS);
       swap(initialArray, i, indexMin);
       setRandomArray([...initialArray]);
     }
@@ -71,7 +72,7 @@ export const bubbleSort = async (
 
       if (order === "ascending") {
         if (initialArray[j] > initialArray[j + 1]) {
-          await sleep(1000);
+          await sleep(DELAY_IN_MS);
 
           swap(initialArray, j, j + 1);
           setRandomArray([...initialArray]);
@@ -79,7 +80,7 @@ export const bubbleSort = async (
         }
       } else {
         if (initialArray[j] < initialArray[j + 1]) {
-          await sleep(1000);
+          await sleep(DELAY_IN_MS);
 
           swap(initialArray, j + 1, j);
           setRandomArray([...initialArray]);
@@ -87,7 +88,7 @@ export const bubbleSort = async (
         }
       }
 
-      await sleep(1000);
+      await sleep(DELAY_IN_MS);
     }
     arr.push(length - 1 - i);
 

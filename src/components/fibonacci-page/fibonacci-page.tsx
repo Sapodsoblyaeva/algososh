@@ -1,29 +1,35 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import styles from "./fibonacci-page.module.css";
 import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";
 import { getFibonacciSequence } from "./algorithm";
 import { Circle } from "../ui/circle/circle";
+import { useForm } from "../../hooks/useForm";
+import { DELAY_IN_MS } from "../../constants/delays";
 
 export const FibonacciPage: React.FC = () => {
-  const [inputValue, setInputValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [fibonacciSequence, setFibonacciSequence] = useState<number[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target as HTMLButtonElement;
-    setInputValue(value);
-  };
+  const { values, handleChange } = useForm({
+    inputValueStr: "",
+    inputValueNum: "",
+  });
 
   const onClick = () => {
-    const fibonacciArray = getFibonacciSequence(parseInt(inputValue));
+    const fibonacciArray = getFibonacciSequence(parseInt(values.inputValueNum));
     setFibonacciSequence(fibonacciArray);
     setCurrentIndex(0);
   };
 
   useEffect(() => {
+    parseInt(values.inputValueNum) <= 0 || parseInt(values.inputValueNum) > 19
+      ? setIsButtonDisabled(true)
+      : setIsButtonDisabled(false);
+
     const timer = setTimeout(() => {
       if (currentIndex < fibonacciSequence.length - 1) {
         setIsLoading(true);
@@ -31,10 +37,10 @@ export const FibonacciPage: React.FC = () => {
       } else {
         setIsLoading(false);
       }
-    }, 1000);
+    }, DELAY_IN_MS);
 
     return () => clearTimeout(timer);
-  }, [currentIndex, fibonacciSequence]);
+  }, [currentIndex, fibonacciSequence, values.inputValueNum]);
 
   return (
     <SolutionLayout title="Последовательность Фибоначчи">
@@ -42,10 +48,12 @@ export const FibonacciPage: React.FC = () => {
         <Input
           extraClass={styles.fibonacci__input}
           onChange={handleChange}
-          value={inputValue}
+          value={values.inputValueNum}
           max={19}
+          maxLength={2}
           isLimitText={true}
           type="number"
+          name="inputValueNum"
         />
         <Button
           extraClass={styles.fibonacci__button}
@@ -53,6 +61,7 @@ export const FibonacciPage: React.FC = () => {
           text="Рассчитать"
           onClick={onClick}
           isLoader={isLoading}
+          disabled={isButtonDisabled}
         />
       </div>
       <div className={styles.fibonacci__circles}>
