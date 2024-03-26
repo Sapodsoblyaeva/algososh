@@ -176,6 +176,7 @@ export const ListPage: React.FC = () => {
     setListForRendering(result);
   }, []);
 
+
   useEffect(() => {
     if (values.inputValueStr === "") {
       setAddButtonDisabled(true);
@@ -183,32 +184,42 @@ export const ListPage: React.FC = () => {
       setAddButtonDisabled(false);
     }
 
-    if (values.inputValueNum === "" || values.inputValueStr === "") {
+    if (values.inputValueNum === "" || values.inputValueStr === "" || parseInt(values.inputValueNum) < 0 ||
+    parseInt(values.inputValueNum) > listForRendering.length - 1) {
       setButtonAddIndexDisabled(true);
     } else {
       setButtonAddIndexDisabled(false);
     }
-  }, [values.inputValueStr, values.inputValueNum]);
+  }, [values.inputValueStr, values.inputValueNum, listForRendering]);
 
   useEffect(() => {
     if (
+      values.inputValueNum === "" ||
       parseInt(values.inputValueNum) < 0 ||
       parseInt(values.inputValueNum) > listForRendering.length - 1 ||
-      listForRendering.length === 0 ||
-      buttonDisabled
+      listForRendering.length === 0
     ) {
-      setDeleteButtonDisabled(true);
       setButtonDeleteIndexDisabled(true);
     } else {
-      setDeleteButtonDisabled(false);
       setButtonDeleteIndexDisabled(false);
     }
-  }, [listForRendering, values.inputValueNum, buttonDisabled]);
+  }, [listForRendering, values.inputValueNum]);
+
+  useEffect(() => {
+    if (parseInt(values.inputValueNum) < 0 ||
+    parseInt(values.inputValueNum) > listForRendering.length - 1 ||
+    listForRendering.length === 0 ||
+    buttonDisabled) {
+      setDeleteButtonDisabled(true);
+    } else  {
+      setDeleteButtonDisabled(false);
+    }
+  }, [listForRendering, values.inputValueNum, buttonDisabled])
+
 
   const onAddToHeadClick = () => {
     setIsNewHeadLoading(true);
     setDeleteButtonDisabled(true);
-    setButtonDeleteIndexDisabled(true);
     list.prepend(values.inputValueStr);
     const result = list.print();
     addingTimer(0, setAddingElementIndex);
@@ -223,16 +234,15 @@ export const ListPage: React.FC = () => {
       setListForRendering(result);
       setIsNewHeadLoading(false);
       setDeleteButtonDisabled(false);
-      setButtonDeleteIndexDisabled(false);
     }, DELAY_IN_MS);
 
     values.inputValueStr = "";
   };
 
+
   const onAddToTailClick = () => {
     setIsNewTailLoading(true);
     setDeleteButtonDisabled(true);
-    setButtonDeleteIndexDisabled(true);
     list.append(values.inputValueStr);
     const result = list.print();
 
@@ -248,7 +258,6 @@ export const ListPage: React.FC = () => {
       setListForRendering(result);
       setIsNewTailLoading(false);
       setDeleteButtonDisabled(false);
-      setButtonDeleteIndexDisabled(false);
     }, DELAY_IN_MS);
 
     values.inputValueStr = "";
@@ -282,8 +291,6 @@ export const ListPage: React.FC = () => {
       setListForRendering(result);
       setIsNewIndexLoading(false);
       setDeleteButtonDisabled(false);
-      setButtonDeleteIndexDisabled(false);
-      setAddButtonDisabled(false);
     }, DELAY_IN_MS);
 
     values.inputValueNum = "";
@@ -326,7 +333,6 @@ export const ListPage: React.FC = () => {
       setListForRendering(result);
       setIsTailDeletedLoading(false);
       setButtonDisabled(false);
-      setButtonDeleteIndexDisabled(false);
     }, DELAY_IN_MS);
   };
 

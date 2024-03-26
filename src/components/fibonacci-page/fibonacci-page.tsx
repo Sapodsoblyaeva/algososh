@@ -20,19 +20,21 @@ export const FibonacciPage: React.FC = () => {
   });
 
   const onClick = () => {
+    setIsLoading(true);
     const fibonacciArray = getFibonacciSequence(parseInt(values.inputValueNum));
     setFibonacciSequence(fibonacciArray);
     setCurrentIndex(0);
+    values.inputValueNum = ""
   };
 
   useEffect(() => {
-    parseInt(values.inputValueNum) <= 0 || parseInt(values.inputValueNum) > 19
+    parseInt(values.inputValueNum) < 0 || parseInt(values.inputValueNum) > 19 || values.inputValueNum === ""
       ? setIsButtonDisabled(true)
       : setIsButtonDisabled(false);
-
+  
     const timer = setTimeout(() => {
       if (currentIndex < fibonacciSequence.length - 1) {
-        setIsLoading(true);
+
         setCurrentIndex(currentIndex + 1);
       } else {
         setIsLoading(false);
