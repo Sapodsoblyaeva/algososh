@@ -48,6 +48,7 @@ export const selectionSort = async (
   setAscendingButtonDisabled(false);
   setDescendingButtonDisabled(false);
   setIsLoading(false);
+  return [...initialArray];
 };
 
 export const bubbleSort = async (
@@ -106,4 +107,6 @@ export const bubbleSort = async (
   setIsLoading(false);
 
   setChangingElements([]);
+
+  return [...initialArray];
 };

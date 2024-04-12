@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import styles from "./list-page.module.css";
 import { Input } from "../ui/input/input";
@@ -176,7 +176,6 @@ export const ListPage: React.FC = () => {
     setListForRendering(result);
   }, []);
 
-
   useEffect(() => {
     if (values.inputValueStr === "") {
       setAddButtonDisabled(true);
@@ -184,8 +183,12 @@ export const ListPage: React.FC = () => {
       setAddButtonDisabled(false);
     }
 
-    if (values.inputValueNum === "" || values.inputValueStr === "" || parseInt(values.inputValueNum) < 0 ||
-    parseInt(values.inputValueNum) > listForRendering.length - 1) {
+    if (
+      values.inputValueNum === "" ||
+      values.inputValueStr === "" ||
+      parseInt(values.inputValueNum) < 0 ||
+      parseInt(values.inputValueNum) > listForRendering.length - 1
+    ) {
       setButtonAddIndexDisabled(true);
     } else {
       setButtonAddIndexDisabled(false);
@@ -206,16 +209,17 @@ export const ListPage: React.FC = () => {
   }, [listForRendering, values.inputValueNum]);
 
   useEffect(() => {
-    if (parseInt(values.inputValueNum) < 0 ||
-    parseInt(values.inputValueNum) > listForRendering.length - 1 ||
-    listForRendering.length === 0 ||
-    buttonDisabled) {
+    if (
+      parseInt(values.inputValueNum) < 0 ||
+      parseInt(values.inputValueNum) > listForRendering.length - 1 ||
+      listForRendering.length === 0 ||
+      buttonDisabled
+    ) {
       setDeleteButtonDisabled(true);
-    } else  {
+    } else {
       setDeleteButtonDisabled(false);
     }
-  }, [listForRendering, values.inputValueNum, buttonDisabled])
-
+  }, [listForRendering, values.inputValueNum, buttonDisabled]);
 
   const onAddToHeadClick = () => {
     setIsNewHeadLoading(true);
@@ -238,7 +242,6 @@ export const ListPage: React.FC = () => {
 
     values.inputValueStr = "";
   };
-
 
   const onAddToTailClick = () => {
     setIsNewTailLoading(true);
@@ -380,7 +383,7 @@ export const ListPage: React.FC = () => {
             onChange={handleChange}
             value={values.inputValueStr}
             type="text"
-            name={"inputValueStr"}
+            name="inputValueStr"
           />
           <Button
             extraClass={styles.list__button}
@@ -389,6 +392,8 @@ export const ListPage: React.FC = () => {
             onClick={onAddToHeadClick}
             isLoader={isNewHeadLoading}
             disabled={addButtonDisabled}
+            name="add-button"
+            value="head"
           />
           <Button
             extraClass={styles.list__button}
@@ -397,6 +402,8 @@ export const ListPage: React.FC = () => {
             onClick={onAddToTailClick}
             isLoader={isNewTailLoading}
             disabled={addButtonDisabled}
+            name="add-button"
+            value="tail"
           />
           <Button
             extraClass={styles.list__button}
@@ -405,6 +412,8 @@ export const ListPage: React.FC = () => {
             onClick={onDeleteHeadClick}
             isLoader={isHeadDeletedLoading}
             disabled={deleteButtonDisabled}
+            name="delete-button"
+            value="head"
           />
           <Button
             extraClass={styles.list__button}
@@ -413,6 +422,8 @@ export const ListPage: React.FC = () => {
             onClick={onDeleteTailClick}
             isLoader={isTailDeletedLoading}
             disabled={deleteButtonDisabled}
+            name="delete-button"
+            value="tail"
           />
         </div>
         <div className={styles.list__buttons}>
@@ -430,6 +441,8 @@ export const ListPage: React.FC = () => {
             onClick={onAddIndexClick}
             isLoader={isNewIndexLoading}
             disabled={buttonAddIndexDisabled}
+            name="add-index-button"
+            value="index"
           />
           <Button
             extraClass={styles.list__bigButton}
@@ -438,6 +451,8 @@ export const ListPage: React.FC = () => {
             onClick={onDeleteIndexClick}
             isLoader={isIndexDeletedLoading}
             disabled={buttonDeleteIndexDisabled}
+            name="delete-index-button"
+            value="index"
           />
         </div>
       </div>

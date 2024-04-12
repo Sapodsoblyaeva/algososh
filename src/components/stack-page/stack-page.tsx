@@ -40,6 +40,8 @@ export const StackPage: React.FC = () => {
   const [buttonAddDisabled, setButtonAddDisabled] = useState<boolean>(false);
   const [buttonDeleteDisabled, setButtonDeleteDisabled] =
     useState<boolean>(false);
+  const [buttonClearDisabled, setButtonClearDisabled] =
+    useState<boolean>(false);
   const [top, setTop] = useState<number>(0);
   const [stackNew, setStackNew] = useState(new Stack<string>());
 
@@ -52,17 +54,20 @@ export const StackPage: React.FC = () => {
     if (values.inputValueStr === "") {
       setButtonAddDisabled(true);
       setButtonDeleteDisabled(true);
+      setButtonClearDisabled(true);
     } else {
       setButtonAddDisabled(false);
     }
 
     if (stackNew.getSize() !== 0) {
       setButtonDeleteDisabled(false);
-      setButtonAddDisabled(false);
+      setButtonClearDisabled(false);
+      // setButtonAddDisabled(false);
     }
   }, [values.inputValueStr, stackNew]);
 
   const onAddClick = async () => {
+    setButtonClearDisabled(true);
     setButtonDeleteDisabled(true);
     setIsLoading(true);
 
@@ -81,9 +86,11 @@ export const StackPage: React.FC = () => {
     setTop(stackNew.getSize() - 1);
     setIsLoading(false);
     setButtonDeleteDisabled(false);
+    setButtonClearDisabled(false);
   };
 
   const onDeleteClick = async () => {
+    setButtonClearDisabled(true);
     setButtonAddDisabled(true);
     setIsLoading(true);
 
@@ -99,11 +106,17 @@ export const StackPage: React.FC = () => {
 
     setIsLoading(false);
     setButtonAddDisabled(false);
+    setButtonClearDisabled(false);
   };
 
-  const onClearClick = () => {
+  const onClearClick = async () => {
+    // setIsLoading(true);
+    // setButtonDeleteDisabled(true);
+    // await sleep(SHORT_DELAY_IN_MS);
     setStackNew(new Stack<string>());
     setOpen(false);
+    // setIsLoading(false);
+    // setButtonDeleteDisabled(false);
   };
 
   return (
@@ -127,6 +140,7 @@ export const StackPage: React.FC = () => {
             onClick={onAddClick}
             isLoader={buttonAddDisabled ? false : isLoading}
             disabled={buttonAddDisabled}
+            value="Добавить"
           />
           <Button
             extraClass={styles.stack__button}
@@ -135,6 +149,7 @@ export const StackPage: React.FC = () => {
             onClick={onDeleteClick}
             isLoader={buttonDeleteDisabled ? false : isLoading}
             disabled={buttonDeleteDisabled}
+            value="Удалить"
           />
         </div>
         <Button
@@ -142,10 +157,9 @@ export const StackPage: React.FC = () => {
           type="button"
           text="Очистить"
           onClick={onClearClick}
-          isLoader={
-            buttonAddDisabled || buttonDeleteDisabled ? false : isLoading
-          }
-          disabled={buttonAddDisabled || buttonDeleteDisabled ? true : false}
+          isLoader={buttonClearDisabled ? false : isLoading}
+          disabled={buttonClearDisabled}
+          value="Очистить"
         />
       </div>
       <div className={styles.stack__circles}>
