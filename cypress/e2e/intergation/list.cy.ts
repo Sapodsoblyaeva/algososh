@@ -1,55 +1,57 @@
+import { circlesElements, circlesStateChanging, circlesStateDefault, circlesStateModified, input, inputIndex, inputValue, listAddButton, listDeleteButton, listIndexAddButton, listIndexDeleteButton } from "../../../src/constants/e2eSelectors";
+
 describe("list", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:3000/list");
+    cy.visit("/list");
   });
 
   it("should have disabled buttons if inputs are empty", () => {
-    cy.get("input").should("have.value", "");
-    cy.get("button[name=add-button]").should("be.disabled");
-    cy.get("button[name=add-index-button]").should("be.disabled");
-    cy.get("button[name=delete-index-button]").should("be.disabled");
+    cy.get(input).should("have.value", "");
+    cy.get(listAddButton).should("be.disabled");
+    cy.get(listIndexAddButton).should("be.disabled");
+    cy.get(listIndexDeleteButton).should("be.disabled");
 
-    cy.get("[class*=circle_content]").should("have.length", "4");
-    cy.get("button[name=delete-button]").should("not.be.disabled");
+    cy.get(circlesElements).should("have.length", "4");
+    cy.get(listDeleteButton).should("not.be.disabled");
 
-    cy.get("input[name=inputValueStr]").type("23");
-    cy.get("button[name=add-button]").should("not.be.disabled");
-    cy.get("button[name=add-index-button]").should("be.disabled");
-    cy.get("button[name=delete-index-button]").should("be.disabled");
+    cy.get(inputValue).type("23");
+    cy.get(listAddButton).should("not.be.disabled");
+    cy.get(listIndexAddButton).should("be.disabled");
+    cy.get(listIndexDeleteButton).should("be.disabled");
 
-    cy.get("button[name=add-button][value=head]").click();
-
-    cy.wait(500);
-    cy.get("input[name=inputValueStr]").should("have.value", "");
-    cy.get("button[name=add-button]").should("be.disabled");
-    cy.get("button[name=add-index-button]").should("be.disabled");
-    cy.get("button[name=delete-index-button]").should("be.disabled");
-
-    cy.get("input[name=inputValueStr]").type("23");
-    cy.get("input[name=inputValueNum]").type("2");
-    cy.get("button[name=add-button]").should("not.be.disabled");
-    cy.get("button[name=add-index-button]").should("not.be.disabled");
-
-    cy.get("button[name=add-index-button]").click();
+    cy.get(`${listAddButton}[value=head]`).click();
 
     cy.wait(500);
-    cy.get("input[name=inputValueStr]").should("have.value", "");
-    cy.get("input[name=inputValueNum]").should("have.value", "");
-    cy.get("button[name=add-button]").should("be.disabled");
-    cy.get("button[name=add-index-button]").should("be.disabled");
-    cy.get("button[name=delete-index-button]").should("be.disabled");
+    cy.get(inputValue).should("have.value", "");
+    cy.get(listAddButton).should("be.disabled");
+    cy.get(listIndexAddButton).should("be.disabled");
+    cy.get(listIndexDeleteButton).should("be.disabled");
 
-    cy.get("input[name=inputValueNum]").type("2");
-    cy.get("button[name=delete-index-button]").should("not.be.disabled");
-    cy.get("button[name=add-index-button]").should("be.disabled");
+    cy.get(inputValue).type("23");
+    cy.get(inputIndex).type("2");
+    cy.get(listAddButton).should("not.be.disabled");
+    cy.get(listIndexAddButton).should("not.be.disabled");
 
-    cy.get("button[name=delete-index-button]").click();
+    cy.get(listIndexAddButton).click();
+
     cy.wait(500);
-    cy.get("input[name=inputValueNum]").should("have.value", "");
+    cy.get(inputValue).should("have.value", "");
+    cy.get(inputIndex).should("have.value", "");
+    cy.get(listAddButton).should("be.disabled");
+    cy.get(listIndexAddButton).should("be.disabled");
+    cy.get(listIndexDeleteButton).should("be.disabled");
+
+    cy.get(inputIndex).type("2");
+    cy.get(listIndexDeleteButton).should("not.be.disabled");
+    cy.get(listIndexAddButton).should("be.disabled");
+
+    cy.get(listIndexDeleteButton).click();
+    cy.wait(500);
+    cy.get(inputIndex).should("have.value", "");
   });
 
   it("should have default list after first render", () => {
-    cy.get("[class*=circle_content]")
+    cy.get(circlesElements)
       .should("have.length", 4)
       .each(($el, index) => {
         if (index === 0) {
@@ -70,67 +72,67 @@ describe("list", () => {
   });
 
   it("should add elem to the head of the list correctly", () => {
-    cy.get("input[name=inputValueStr]").type("3");
-    cy.get("button[name=add-button][value=head]").click();
+    cy.get(inputValue).type("3");
+    cy.get(`${listAddButton}[value=head]`).click();
 
     cy.wait(500);
 
-    cy.get("[class*=circle_content]")
+    cy.get(circlesElements)
       .filter(":nth-child(1)")
       .as("firstAddedElement");
 
-    cy.get("@firstAddedElement").get("[class*=circle_changing]");
+    cy.get("@firstAddedElement").get(circlesStateChanging);
     cy.get("@firstAddedElement").contains("3");
     cy.get("@firstAddedElement").contains("head");
-    cy.get("[class*=circle_content]").each(($el, index) => {
+    cy.get(circlesElements).each(($el, index) => {
       if (index === 1) {
         cy.wrap($el).contains("1");
         cy.wrap($el).should("not.contain", "head");
       }
     });
-    cy.get("@firstAddedElement").get("[class*=circle_modified]");
+    cy.get("@firstAddedElement").get(circlesStateModified);
   });
 
   it("should add elem to the tail of the list correctly", () => {
-    cy.get("input[name=inputValueStr]").type("3");
-    cy.get("button[name=add-button][value=tail]").click();
+    cy.get(inputValue).type("3");
+    cy.get(`${listAddButton}[value=tail]`).click();
 
     cy.get("[data-testid=circle]").as("circles");
-    cy.get("@circles").contains("3").get("[class*=circle_changing]");
-    cy.get("@circles").contains("0").get("[class*=circle_changing]");
+    cy.get("@circles").contains("3").get(circlesStateChanging);
+    cy.get("@circles").contains("0").get(circlesStateChanging);
 
     cy.wait(1000);
     cy.get("@circles").each(($el, index) => {
       if (index === 4) {
         cy.wrap($el).should("contain", "3");
         cy.wrap($el).should("contain", "tail");
-        cy.wrap($el).get("[class*=circle_modified]");
+        cy.wrap($el).get(circlesStateModified);
       }
       if (index === 3) {
         cy.wrap($el).should("contain", "0");
         cy.wrap($el).should("not.contain", "tail");
-        cy.wrap($el).get("[class*=circle_default]");
+        cy.wrap($el).get(circlesStateDefault);
       }
     });
     cy.wait(500);
-    cy.get("@circles").get("[class*=circle_default]");
+    cy.get("@circles").get(circlesStateDefault);
   });
 
   it("should add elem by the index to the list correctly", () => {
-    cy.get("input[name=inputValueStr]").type("3");
-    cy.get("input[name=inputValueNum]").type("1");
-    cy.get("button[name=add-index-button]").click();
+    cy.get(inputValue).type("3");
+    cy.get(inputIndex).type("1");
+    cy.get(listIndexAddButton).click();
 
     cy.get("[data-testid=circle]").as("circles");
 
-    cy.get("@circles").contains("8").get("[class*=circle_default]");
-    cy.get("@circles").contains("3").get("[class*=circle_changing]");
-    cy.get("@circles").contains("1").get("[class*=circle_changing]");
+    cy.get("@circles").contains("8").get(circlesStateDefault);
+    cy.get("@circles").contains("3").get(circlesStateChanging);
+    cy.get("@circles").contains("1").get(circlesStateChanging);
 
     cy.wait(500);
-    cy.get("@circles").contains("8").get("[class*=circle_changing]");
+    cy.get("@circles").contains("8").get(circlesStateChanging);
     cy.wait(500);
-    cy.get("@circles").contains("3").get("[class*=circle_modified]");
+    cy.get("@circles").contains("3").get(circlesStateModified);
 
     cy.get("@circles").each(($el, index) => {
       if (index === 1) {
@@ -143,30 +145,30 @@ describe("list", () => {
   });
 
   it("should delete elem by the index to the list correctly", () => {
-    cy.get("input[name=inputValueNum]").type("1");
-    cy.get("button[name=delete-index-button]").click();
+    cy.get(inputIndex).type("1");
+    cy.get(listIndexDeleteButton).click();
 
     cy.get("[data-testid=circle]").as("circles");
     cy.get("[data-testid=circle-tail]").as("smallCircles");
 
-    cy.get("@smallCircles").contains("8").get("[class*=circle_changing]");
-    cy.get("@circles").contains("1").get("[class*=circle_changing]");
-    cy.get("@circles").contains("8").get("[class*=circle_default]");
+    cy.get("@smallCircles").contains("8").get(circlesStateChanging);
+    cy.get("@circles").contains("1").get(circlesStateChanging);
+    cy.get("@circles").contains("8").get(circlesStateDefault);
 
     cy.wait(1000);
 
     cy.get("@circles").each(($el, index) => {
       if (index === 1) {
         cy.wrap($el).should("have.value", "");
-        cy.wrap($el).get("[class*=circle_changing]");
+        cy.wrap($el).get(circlesStateChanging);
       }
 
       if (index === 0) {
-        cy.wrap($el).get("[class*=circle_changing]");
+        cy.wrap($el).get(circlesStateChanging);
       }
     });
     cy.wait(1500);
-    cy.get("@circles").get("[class*=circle_default]");
+    cy.get("@circles").get(circlesStateDefault);
   });
 
   it("should delete elem from the head of the list correctly", () => {
@@ -176,19 +178,19 @@ describe("list", () => {
     cy.get("@circles").first().as("headElem");
     cy.get("@headElem").contains("1");
     cy.get("@headElem").contains("head");
-    cy.get("@headElem").get("[class*=circle_default]");
+    cy.get("@headElem").get(circlesStateDefault);
 
-    cy.get("button[name=delete-button][value=head]").click();
+    cy.get(`${listDeleteButton}[value=head]`).click();
 
     cy.get("@headElem").should("have.value", "");
-    cy.get("@headElem").get("[class*=circle_changing]");
-    cy.get("@smallCircles").contains("1").get("[class*=circle_changing]");
+    cy.get("@headElem").get(circlesStateChanging);
+    cy.get("@smallCircles").contains("1").get(circlesStateChanging);
 
     cy.wait(1000);
 
     cy.get("@headElem").contains("8");
     cy.get("@headElem").contains("head");
-    cy.get("@headElem").get("[class*=circle_default]");
+    cy.get("@headElem").get(circlesStateDefault);
   });
 
   it("should delete elem from the tail of the list correctly", () => {
@@ -198,17 +200,17 @@ describe("list", () => {
     cy.get("@circles").last().as("tailElem");
     cy.get("@tailElem").contains("0");
     cy.get("@tailElem").contains("tail");
-    cy.get("@tailElem").get("[class*=circle_default]");
+    cy.get("@tailElem").get(circlesStateDefault);
 
-    cy.get("button[name=delete-button][value=tail]").click();
-    cy.get("@tailElem").get("[class*=circle_changing]");
+    cy.get(`${listDeleteButton}[value=tail]`).click();
+    cy.get("@tailElem").get(circlesStateChanging);
     cy.get("@tailElem").should("have.value", "");
-    cy.get("@smallCircles").contains("0").get("[class*=circle_changing]");
+    cy.get("@smallCircles").contains("0").get(circlesStateChanging);
 
     cy.wait(1000);
 
     cy.get("@tailElem").contains("34");
     cy.get("@tailElem").contains("tail");
-    cy.get("@tailElem").get("[class*=circle_default]");
+    cy.get("@tailElem").get(circlesStateDefault);
   });
 });

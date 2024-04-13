@@ -1,6 +1,6 @@
 describe("routing is working", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:3000/");
+    cy.visit("/");
   });
 
   it("should be routed to string recursion page", () => {

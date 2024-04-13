@@ -1,4 +1,7 @@
-/// <reference types="cypress" />
+// / <reference types="cypress" />
+
+import { input } from "../../src/constants/e2eSelectors";
+
 // ***********************************************
 // This example commands.ts shows you how to
 // create various custom commands and overwrite
