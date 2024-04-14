@@ -75,6 +75,8 @@ export const StringComponent: React.FC = () => {
     values.inputValueStr = "";
   };
 
+  console.log(word.slice(word.length - 1));
+
   return (
     <SolutionLayout title="Строка">
       <div className={styles.string__layout}>
@@ -94,6 +96,7 @@ export const StringComponent: React.FC = () => {
           onClick={onClick}
           isLoader={isLoading}
           disabled={isButtonDisabled}
+          data-testid="add-button"
         />
       </div>
       <div className={styles.string__circles}>

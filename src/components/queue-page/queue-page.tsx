@@ -173,6 +173,7 @@ export const QueuePage: React.FC = () => {
             onClick={onAddClick}
             isLoader={buttonAddDisabled ? false : isLoading}
             disabled={buttonAddDisabled}
+            value="Добавить"
           />
           <Button
             extraClass={styles.queue__button}
@@ -181,6 +182,7 @@ export const QueuePage: React.FC = () => {
             onClick={onDeleteClick}
             isLoader={buttonDeleteDisabled ? false : isLoading}
             disabled={buttonDeleteDisabled}
+            value="Удалить"
           />
         </div>
         <Button
@@ -192,6 +194,7 @@ export const QueuePage: React.FC = () => {
             buttonAddDisabled || buttonDeleteDisabled ? false : isLoading
           }
           disabled={buttonClearDisabled}
+          value="Очистить"
         />
       </div>
       <div className={styles.queue__circles}>{renderInitialCircles()}</div>

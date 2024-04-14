@@ -22,22 +22,30 @@ export const MainPage: React.FC<MainPageProps> = ({ extraClass = "" }) => {
         </p>
       </div>
       <div className={styles.cards_box}>
-        <Link className={styles.link} to="/recursion">
+        <Link
+          className={styles.link}
+          to="/recursion"
+          data-testid="recursion-card"
+        >
           <div className={`${styles.card} ${styles.string}`} />
         </Link>
-        <Link className={styles.link} to="/fibonacci">
+        <Link
+          className={styles.link}
+          to="/fibonacci"
+          data-testid="fibonacci-card"
+        >
           <div className={`${styles.card} ${styles.fibonacci}`} />
         </Link>
-        <Link className={styles.link} to="/sorting">
+        <Link className={styles.link} to="/sorting" data-testid="sorting-card">
           <div className={`${styles.card} ${styles.arr}`} />
         </Link>
-        <Link className={styles.link} to="/stack">
+        <Link className={styles.link} to="/stack" data-testid="stack-card">
           <div className={`${styles.card} ${styles.stack}`} />
         </Link>
-        <Link className={styles.link} to="/queue">
+        <Link className={styles.link} to="/queue" data-testid="queue-card">
           <div className={`${styles.card} ${styles.queue}`} />
         </Link>
-        <Link className={styles.link} to="/list">
+        <Link className={styles.link} to="/list" data-testid="list-card">
           <div className={`${styles.card} ${styles.list}`} />
         </Link>
       </div>
